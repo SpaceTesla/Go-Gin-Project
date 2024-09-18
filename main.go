@@ -1,10 +1,11 @@
 package main
 
 import (
-	"errors"
-	"net/http"
+    "log"
+    "errors"
+    "net/http"
 
-	"github.com/gin-gonic/gin"
+    "github.com/gin-gonic/gin"
 )
 
 type book struct {
@@ -18,6 +19,10 @@ var books = []book{
     {ID: "1", Title: "Golang", Author: "Google", Qty: 10},
     {ID: "2", Title: "Java", Author: "Oracle", Qty: 20},
     {ID: "3", Title: "Python", Author: "Python Software Foundation", Qty: 30},
+}
+
+func info(c *gin.Context) {
+    c.IndentedJSON(http.StatusOK, gin.H{"message": "Welcome to the library"})
 }
 
 func checkoutBook(c *gin.Context) {
@@ -104,10 +109,15 @@ func createBook(c *gin.Context) {
 
 func main() {
     router := gin.Default()
+    router.GET("/", info)
     router.GET("/books", getBooks)
     router.POST("/books", createBook)
     router.GET("/books/:id", bookByID)
     router.PATCH("/checkout", checkoutBook)
     router.PATCH("/return", returnBook)
-    router.Run("localhost:8080")
+    
+    log.Println("Starting server on 0.0.0.0:8080")
+    if err := router.Run("0.0.0.0:8080"); err != nil {
+        log.Fatalf("Failed to start server: %v", err)
+    }
 }
